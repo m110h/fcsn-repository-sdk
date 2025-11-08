@@ -1,0 +1,18 @@
+# https://taskfile.dev
+# See: https://taskfile.dev/api/  
+
+version: "3"  
+
+tasks:  
+    default: # Если не указать конкретную команду, будут выполнены дефолтные
+        cmds:  
+            - task: test
+    update:
+        desc: "Update dependences"
+        cmds:
+            - go get -u
+            - go mod tidy
+    test:
+        desc: "Run tests"
+        cmds:
+            - go test -v
