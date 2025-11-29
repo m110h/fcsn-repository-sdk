@@ -1,4 +1,4 @@
-module github.com/m110h/fcsn-storage-sdk
+module github.com/m110h/fcsn-repository-sdk
 
 go 1.24.6
 
