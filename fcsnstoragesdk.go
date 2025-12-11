@@ -8,7 +8,6 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/metadata"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 )
@@ -83,16 +82,11 @@ func (c *Client) SetChart(ctx context.Context, uid, chart string) (time.Time, er
 
 /* Some description */
 func (c *Client) GetChart(ctx context.Context, uid string) (string, error) {
-	md := metadata.Pairs(
-		"trace.id", "current-trace-id",
-	)
-	_ctx := metadata.NewOutgoingContext(ctx, md)
-
 	req := &pb.GetChartRequest{
 		Uid: uid,
 	}
 
-	res, err := c.client.GetChart(_ctx, req)
+	res, err := c.client.GetChart(ctx, req)
 	if err != nil {
 		return "", err
 	}
