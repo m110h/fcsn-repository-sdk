@@ -8,6 +8,9 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
+
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 )
 
 /* Some description */
@@ -16,10 +19,13 @@ type Connection struct {
 }
 
 /* Some description */
-func (c *Connection) Connect(target string, isInsecure bool) error {
+func (c *Connection) Connect(target string, isInsecure, isTraced bool) error {
 	var opts []grpc.DialOption
 	if isInsecure {
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}
+	if isTraced {
+		opts = append(opts, grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
 	}
 	conn, err := grpc.NewClient(target, opts...)
 	if err != nil {
@@ -48,10 +54,10 @@ func NewClient(conn *Connection) *Client {
 }
 
 /* Some description */
-func NewConnectionAndClient(target string, isInsecure bool) (*Connection, *Client, error) {
+func NewConnectionAndClient(target string, isInsecure, isTraced bool) (*Connection, *Client, error) {
 	var conn Connection
 
-	err := conn.Connect(target, isInsecure)
+	err := conn.Connect(target, isInsecure, isTraced)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -77,11 +83,16 @@ func (c *Client) SetChart(ctx context.Context, uid, chart string) (time.Time, er
 
 /* Some description */
 func (c *Client) GetChart(ctx context.Context, uid string) (string, error) {
+	md := metadata.Pairs(
+		"trace.id", "current-trace-id",
+	)
+	_ctx := metadata.NewOutgoingContext(ctx, md)
+
 	req := &pb.GetChartRequest{
 		Uid: uid,
 	}
 
-	res, err := c.client.GetChart(ctx, req)
+	res, err := c.client.GetChart(_ctx, req)
 	if err != nil {
 		return "", err
 	}

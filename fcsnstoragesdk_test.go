@@ -35,7 +35,7 @@ func Unsubscribe(client *Client, source_uid, target_uid string) (time.Time, erro
 }
 
 func TestSetChart(t *testing.T) {
-	conn, cli, err := NewConnectionAndClient("localhost:9090", true)
+	conn, cli, err := NewConnectionAndClient("localhost:9090", true, false)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
@@ -53,7 +53,7 @@ func TestSetChart(t *testing.T) {
 }
 
 func TestGetChart(t *testing.T) {
-	conn, cli, err := NewConnectionAndClient("localhost:9090", true)
+	conn, cli, err := NewConnectionAndClient("localhost:9090", true, false)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
